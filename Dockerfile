@@ -19,15 +19,6 @@ RUN apt-get install -y gawk wget git-core diffstat unzip texinfo gcc-multilib g+
      apt-utils tmux xz-utils debianutils iputils-ping libncurses5-dev vim \
      liblz4-tool zstd zstd iproute2 iptables file
 
-# Pull in gcc-8 as it's been removed from 22.04
-RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-8/gcc-8_8.4.0-3ubuntu2_amd64.deb
-RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-8/gcc-8-base_8.4.0-3ubuntu2_amd64.deb
-RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-8/libgcc-8-dev_8.4.0-3ubuntu2_amd64.deb
-RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-8/cpp-8_8.4.0-3ubuntu2_amd64.deb
-RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-8/libmpx2_8.4.0-3ubuntu2_amd64.deb
-RUN wget http://mirrors.kernel.org/ubuntu/pool/main/i/isl/libisl22_0.22.1-1_amd64.deb
-RUN apt install -y ./libisl22_0.22.1-1_amd64.deb ./libmpx2_8.4.0-3ubuntu2_amd64.deb ./cpp-8_8.4.0-3ubuntu2_amd64.deb ./libgcc-8-dev_8.4.0-3ubuntu2_amd64.deb ./gcc-8-base_8.4.0-3ubuntu2_amd64.deb ./gcc-8_8.4.0-3ubuntu2_amd64.deb
-
 # libc6-dev files are also missing
 RUN apt install -y libc6-dev
 
@@ -37,13 +28,10 @@ RUN apt-get install -y coreutils python2.7 libsdl1.2-dev xterm libssl-dev libelf
 
 # Additional host packages required by poky/scripts/wic
 RUN apt-get install -y curl dosfstools mtools parted syslinux tree zip
-
-RUN apt-get install -y nano
-
 RUN update-ca-certificates
 
 # Create a non-root user that will perform the actual build
-RUN id github 2>/dev/null || useradd --uid 1000 --create-home github
+RUN id github 2>/dev/null || useradd --uid 1001 --create-home github
 RUN apt-get install -y sudo
 RUN echo "github ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
 
@@ -64,12 +52,6 @@ ENV LANGUAGE en_US.UTF-8
 
 USER github
 WORKDIR /home/github
-
-# Setup a default git user for clone/checkout
-RUN git config --global user.email "yocto@github.cc"
-RUN git config --global user.name "yocto"
-RUN git config --global http.postBuffer 20k
-RUN git config --global url."https://github.com/".insteadOf git://github.com/
 
 CMD "/bin/bash"
 
