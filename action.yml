@@ -1,0 +1,57 @@
+name: 'Yocto Build'
+description: 'GH Action to build Yocto images and SDKs using bitbake'
+inputs:
+  machine:
+    description: MACHINE to build
+    required: false
+    default: ''
+  images:
+    description: list of images to build
+    required: true
+    default: core-image-minimal
+  sdk-images:
+    description: list of images to build a SDK for
+    required: true
+    default: core-image-minimal
+  sstate_dir:
+    description: external SSTATE_DIR location
+    required: false
+  token:
+    description: credentials for private repo checkouts, also passed to bitbake as part of "GIT_USER" variable
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Configure git
+      run: |
+          echo "running as ${{ github.actor }} with token ${{ inputs.token }}"
+          git config --global user.email "yocto@github.cc"
+          git config --global user.name "yocto"
+          git config --global http.postBuffer 1024k
+          git config --global http.version HTTP/1.1
+          git config --global url."https://github.com/".insteadOf git@github.com:
+          git config --global url."https://".insteadOf git://
+          git config credential.helper "!f() { echo \"username=${{ github.actor }}\\npassword=${{ inputs.token }}\"; }; f"
+      shell: bash
+    - name: Checkout the repo
+      uses: actions/checkout@v4
+      with:
+        token: ${{ inputs.token }}
+        submodules: true
+    - name: Image
+      run: |
+        export BB_ENV_PASSTHROUGH_ADDITIONS="MACHINE SSTATE_DIR GIT_USER"
+        export SSTATE_DIR=${{ inputs.sstate_dir }}
+        export GIT_USER="${{ github.actor }}:${{ inputs.token }}"
+        source ./prepare-env 
+        bitbake -k ${{ inputs.images }}
+      shell: bash
+    - name: SDK
+      run: |
+        export BB_ENV_PASSTHROUGH_ADDITIONS="MACHINE SSTATE_DIR GIT_USER"
+        export SSTATE_DIR=${{inputs.sstate_dir}}
+        export GIT_USER="${{ github.actor }}:${{ inputs.token }}"
+        source ./prepare-env 
+        bitbake -k ${{ inputs.sdk-images }} -c populate_sdk
+      shell: bash
+
