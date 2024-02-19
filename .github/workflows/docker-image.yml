@@ -5,12 +5,22 @@ on:
   pull_request:
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - uses: actions/checkout@v4
+    - name: Build the Docker image (used by GH worker)
+      run: docker build . --file Dockerfile --tag ghcr.io/emobotics-dev/yocto-ci-docker
+    - name: Build the Podman image (used e.g. locally)
+      run: docker build . --file Containerfile --tag ghcr.io/emobotics-dev/yocto-ci-podman
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Push to registry
+      run: |
+        docker push ghcr.io/emobotics-dev/yocto-ci-docker
+        docker push ghcr.io/emobotics-dev/yocto-ci-podman
+    
