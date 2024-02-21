@@ -15,10 +15,14 @@ inputs:
     default: core-image-minimal
   sstate_dir:
     description: external SSTATE_DIR location
+    default: ""
     required: false
   token:
     description: credentials for private repo checkouts, also passed to bitbake as part of "GIT_USER" variable
     required: true
+  superclean:
+    descripion: prune the working directory before checkout to initiate a completely clean start
+    default: false
 runs:
   using: "composite"
   steps:
@@ -31,7 +35,11 @@ runs:
           git config --global http.version HTTP/1.1
           git config --global url."https://github.com/".insteadOf git@github.com:
           git config --global url."https://".insteadOf git://
-          git config credential.helper "!f() { echo \"username=${{ github.actor }}\\npassword=${{ inputs.token }}\"; }; f"
+          git config --global credential.helper "!f() { echo \"username=${{ github.actor }}\\npassword=${{ inputs.token }}\"; }; f"
+      shell: bash
+    - name: Superclean
+      if: ${{ inputs.superclean }}
+      run: rm -rf dt5k-yocto
       shell: bash
     - name: Checkout the repo
       uses: actions/checkout@v4
