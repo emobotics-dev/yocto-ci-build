@@ -52,6 +52,8 @@ runs:
         export SSTATE_DIR=${{ inputs.sstate_dir }}
         export GIT_USER="${{ github.actor }}:${{ inputs.token }}"
         source ./prepare-env 
+        rm -rf buildhistory
+        rm -rf tmp*/
         bitbake -k ${{ inputs.images }}
       shell: bash
     - name: SDK
