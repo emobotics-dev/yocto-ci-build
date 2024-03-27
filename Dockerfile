@@ -24,10 +24,10 @@ RUN apt install -y libc6-dev
 
 # Additional recommended packages
 RUN apt-get install -y coreutils python2.7 libsdl1.2-dev xterm libssl-dev libelf-dev \
-     ca-certificates whiptail # openjdk-11-jre 
+     ca-certificates whiptail # openjdk-11-jre
 
 # Additional host packages required by poky/scripts/wic
-RUN apt-get install -y curl dosfstools mtools parted syslinux tree zip
+RUN apt-get install -y curl dosfstools mtools parted syslinux tree zip tzdata
 RUN update-ca-certificates
 
 # Create a non-root user that will perform the actual build

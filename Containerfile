@@ -27,7 +27,7 @@ RUN apt-get install -y coreutils python2.7 libsdl1.2-dev xterm libssl-dev libelf
      ca-certificates whiptail # openjdk-11-jre 
 
 # Additional host packages required by poky/scripts/wic
-RUN apt-get install -y curl dosfstools mtools parted syslinux tree zip
+RUN apt-get install -y curl dosfstools mtools parted syslinux tree zip tzdata
 RUN update-ca-certificates
 
 # Create a non-root user that will perform the actual build
@@ -45,6 +45,8 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 
 # Deployment helper
 RUN apt-get install -y rsync
+RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
+
 
 
 RUN update-alternatives --install /bin/sh sh /bin/bash 100

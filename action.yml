@@ -32,6 +32,7 @@ runs:
           git config --global user.email "yocto@github.cc"
           git config --global user.name "yocto"
           git config --global http.postBuffer 1024k
+          git config --global https.postBuffer 1024k
           git config --global http.version HTTP/1.1
           git config --global url."https://github.com/".insteadOf git@github.com:
           git config --global url."https://".insteadOf git://
