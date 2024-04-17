@@ -47,6 +47,12 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 RUN apt-get install -y rsync
 
 
+# work-around for Azure devops trying to add a group
+# see https://github.com/microsoft/azure-pipelines-agent/issues/4332
+RUN chmod u+s /usr/sbin/useradd /usr/sbin/groupadd /usr/sbin/usermod && \
+    chmod u+w /etc/sudoers
+COPY su_hack.sh /bin/su
+
 RUN update-alternatives --install /bin/sh sh /bin/bash 100
 
 ENV LC_ALL en_US.UTF-8
