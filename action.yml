@@ -5,6 +5,10 @@ inputs:
     description: MACHINE to build
     required: false
     default: ''
+  distro:
+    description: DISTRO to use for build
+    required: false
+    default: ''
   images:
     description: list of images to build
     required: true
@@ -49,9 +53,11 @@ runs:
         submodules: true
     - name: Image
       run: |
-        export BB_ENV_PASSTHROUGH_ADDITIONS="MACHINE SSTATE_DIR GIT_USER"
+        export BB_ENV_PASSTHROUGH_ADDITIONS="MACHINE DISTRO SSTATE_DIR GIT_USER"
         export SSTATE_DIR=${{ inputs.sstate_dir }}
         export GIT_USER="${{ github.actor }}:${{ inputs.token }}"
+        export MACHINE=${{ inputs.machine }}"
+        export DISTRO=${{ inputs.distro }}"
         source ./prepare-env 
         rm -rf buildhistory
         rm -rf tmp*/
@@ -59,9 +65,11 @@ runs:
       shell: bash
     - name: SDK
       run: |
-        export BB_ENV_PASSTHROUGH_ADDITIONS="MACHINE SSTATE_DIR GIT_USER"
+        export BB_ENV_PASSTHROUGH_ADDITIONS="MACHINE DISTRO SSTATE_DIR GIT_USER"
         export SSTATE_DIR=${{inputs.sstate_dir}}
         export GIT_USER="${{ github.actor }}:${{ inputs.token }}"
+        export MACHINE=${{ inputs.machine }}"
+        export DISTRO=${{ inputs.distro }}"
         source ./prepare-env 
         bitbake -k ${{ inputs.sdk-images }} -c populate_sdk
       shell: bash
